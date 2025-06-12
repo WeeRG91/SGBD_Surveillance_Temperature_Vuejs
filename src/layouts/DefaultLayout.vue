@@ -1,15 +1,17 @@
 <template>
-  <div>
+  <div class="min-h-screen flex flex-col">
     <Navbar />
-    <RouterView />
+    <main class="flex-grow">
+      <RouterView />
+    </main>
     <Footer />
   </div>
 </template>
 
 <script setup>
 import { RouterView } from "vue-router";
-import Navbar from "../components/Navbar.vue";
-import Footer from "../components/Footer.vue";
+import Navbar from "../components/layout/Navbar.vue";
+import Footer from "../components/layout/Footer.vue";
 </script>
 
 <style scoped></style>

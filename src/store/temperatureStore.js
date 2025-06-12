@@ -1,31 +1,47 @@
 import { defineStore } from "pinia";
 import temperatureApi from "../api/temperature";
+import { useToastStore } from "./toastStore";
 
-export const useEtatElementStore = defineStore("etatElement", {
+export const useTemperatureStore = defineStore("temperature", {
   state: () => ({
-    message: null,
-    loading: false,
-    error: null,
+    temperatures: null,
+    errors: null,
   }),
   actions: {
-    async createTemperature(data) {
-      this.loading = true;
-      this.error = null;
-      this.message = null;
+    async fetchTemperaturesWithAlerteByElementId(data) {
+      const toast = useToastStore();
+      this.errors = null;
       try {
-        const response = await temperatureApi.create(data);
-        this.message = response.data.message;
+        const response = await temperatureApi.getTemperaturesWithAlerteByElementId(data);
+        this.temperatures = response.data.temperatures;
       } catch (error) {
         if (error.response) {
           this.error =
-            error.response.data.message || "Creating temperature failed";
+            error.response.data.message || "Fetching temperatures with alerte failed";
+          toast.addToast(error.response.data.message, "error");
         } else if (error instanceof Error) {
           this.error = error.message;
         } else {
           this.error = String(error);
         }
-      } finally {
-        this.loading = false;
+      }
+    },
+    async storeTemperature(data) {
+      const toast = useToastStore();
+      this.errors = null;
+      try {
+        const response = await temperatureApi.create(data);
+        toast.addToast(response.data.message);
+      } catch (error) {
+        if (error.response) {
+          this.error =
+            error.response.data.message || "Storing temperature failed";
+          toast.addToast(error.response.data.message, "error");
+        } else if (error instanceof Error) {
+          this.error = error.message;
+        } else {
+          this.error = String(error);
+        }
       }
     },
   },

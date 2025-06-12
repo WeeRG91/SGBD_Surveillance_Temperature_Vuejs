@@ -16,6 +16,9 @@ const elementApi = {
   delete(id) {
     return api.delete(`/elements/${id}`);
   },
+  getTransferOptions(data) {
+    return api.get("/elements/transfer-options", { params: data });
+  },
 };
 
 export default elementApi;

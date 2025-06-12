@@ -3,14 +3,17 @@
     <div
       class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
     >
-      <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
+      <RouterLink
+        :to="{ name: 'home' }"
+        class="flex items-center space-x-3 rtl:space-x-reverse"
+      >
         <img src="/logo.png" class="h-10" alt="SGBD Logo" />
         <span
           class="text-[var(--primary-color)] self-center text-2xl font-bold whitespace-nowrap"
         >
           SGBD - FrigoMonitor
         </span>
-      </a>
+      </RouterLink>
 
       <!-- Burger Button -->
       <button
@@ -41,7 +44,7 @@
         class="w-full md:block md:w-auto transition-all duration-700 overflow-hidden"
         :class="{
           'max-h-0 opacity-0 md:max-h-full md:opacity-100': !isOpen,
-          'max-h-[500px] opacity-100': isOpen
+          'max-h-[500px] opacity-100': isOpen,
         }"
         id="mobile-menu"
       >
@@ -49,24 +52,24 @@
           class="flex flex-col mt-4 space-y-2 md:space-y-0 md:flex-row md:space-x-6 lg:space-x-8 md:mt-0 text-[var(--primary-color)] font-medium"
         >
           <li>
-            <a
-              href="#"
+            <RouterLink
+              :to="{ name: 'home' }"
               class="block font-semibold md:text-lg py-2 px-3 rounded-md text-[var(--primary-color)] bg-[var(--secondary-color)] hover:bg-[var(--primary-color)] hover:text-[var(--secondary-color)] transition-all duration-300"
-              >Home</a
+              >Home</RouterLink
             >
           </li>
           <li>
-            <a
-              href="#"
+            <RouterLink
+              :to="{ name: 'element' }"
               class="block font-semibold md:text-lg py-2 px-3 rounded-md text-[var(--primary-color)] bg-[var(--secondary-color)] hover:bg-[var(--primary-color)] hover:text-[var(--secondary-color)] transition-all duration-300"
-              >Services</a
+              >Elements</RouterLink
             >
           </li>
           <li>
-            <a
-              href="#"
+            <RouterLink
+              :to="{ name: 'emplacement' }"
               class="block font-semibold md:text-lg py-2 px-3 rounded-md text-[var(--primary-color)] bg-[var(--secondary-color)] hover:bg-[var(--primary-color)] hover:text-[var(--secondary-color)] transition-all duration-300"
-              >Pricing</a
+              >Emplacements</RouterLink
             >
           </li>
         </ul>
@@ -77,6 +80,7 @@
 
 <script setup>
 import { ref } from "vue";
+import { RouterLink } from "vue-router";
 
 const isOpen = ref(false);
 </script>

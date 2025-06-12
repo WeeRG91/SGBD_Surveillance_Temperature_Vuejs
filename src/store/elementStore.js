@@ -1,111 +1,119 @@
 import { defineStore } from "pinia";
 import elementApi from "../api/element";
+import { useToastStore } from "./toastStore";
 
 export const useElementStore = defineStore("element", {
   state: () => ({
     elements: [],
     currentElement: null,
-    loading: false,
-    error: null,
+    errors: null,
   }),
   actions: {
     async fetchElements() {
-      this.error = null;
-      this.loading = true;
+      const toast = useToastStore();
+      this.errors = null;
       try {
         const response = await elementApi.getAll();
         this.elements = response.data.elements;
       } catch (error) {
         if (error.response) {
-          this.error =
-            error.response.data.message || "Fetching elements failed";
+          if (error.response.data.message) {
+            this.errors = error.response.data.message;
+            toast.addToast(error.response.data.message, "error");
+          }
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = { message: error.message };
         } else {
-          this.error = String(error);
+          this.errors = { message: String(error) };
         }
-      } finally {
-        this.loading = false;
       }
     },
     async fetchElement(id) {
-      this.error = null;
-      this.loading = true;
+      const toast = useToastStore();
+      this.errors = null;
+      console.log("Fetching element with ID:", id);
       try {
         const response = await elementApi.getById(id);
         this.currentElement = response.data.element;
       } catch (error) {
         if (error.response) {
-          this.error = error.response.data.message || "Fetching element failed";
+          if (error.response.data.message) {
+            this.errors = error.response.data.message;
+            toast.addToast(error.response.data.message, "error");
+          }
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = { message: error.message };
         } else {
-          this.error = String(error);
+          this.errors = { message: String(error) };
         }
-      } finally {
-        this.loading = false;
       }
     },
     async createElement(data) {
-      this.error = null;
-      this.loading = true;
+      const toast = useToastStore();
+      this.errors = null;
       try {
         const response = await elementApi.create(data);
-        this.elements = [...this.elements, response.data.element];
+        this.elements.unshift(response.data.element);
+        toast.addToast("Element frigorifique crée avec succès.");
       } catch (error) {
         if (error.response) {
-          this.error = error.response.data.message || "Creating element failed";
+          if (error.response.data.errors) {
+            this.errors = error.response.data.errors;
+            toast.addToast("Information invalide", "error");
+          } else {
+            this.errors = {
+              message: error.response.data.message || "Creating element failed",
+            };
+            toast.addToast(error.response.data.message, "error");
+          }
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = { message: error.message };
         } else {
-          this.error = String(error);
+          this.errors = { message: String(error) };
         }
-      } finally {
-        this.loading = false;
       }
     },
     async updateElement(id, data) {
-      this.error = null;
-      this.loading = true;
+      const toast = useToastStore();
+      this.errors = null;
       try {
         const response = await elementApi.update(id, data);
-        this.elements = this.elements.map((element) =>
-          element.id === id ? response.data.element : element
-        );
-        if (this.currentElement?.id === id) {
-          this.currentElement = response.data.element;
-        }
+        this.fetchElements();
+        this.fetchElement(id);
+        toast.addToast("Element mis à jour avec succès.");
       } catch (error) {
+        console.log(error);
         if (error.response) {
-          this.error = error.response.data.message || "Updating element failed";
+          this.errors =
+            error.response.data.message || "Updating element failed";
+          toast.addToast(error.response.data.message, "error");
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = error.message;
         } else {
-          this.error = String(error);
+          this.errors = String(error);
         }
-      } finally {
-        this.loading = false;
       }
     },
     async deleteElement(id) {
-      this.error = null;
-      this.loading = true;
+      const toast = useToastStore();
+      this.errors = null;
       try {
         await elementApi.delete(id);
         this.elements = this.elements.filter((element) => element.id !== id);
         if (this.currentElement?.id === id) {
           this.currentElement = null;
         }
+        toast.addToast("Element supprimé avec succès.")
       } catch (error) {
         if (error.response) {
-          this.error = error.response.data.message || "Deleting element failed";
+          this.errors =
+            error.response.data.message || "Deleting element failed";
+          toast.addToast(error.response.data.message, error);
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = error.message;
         } else {
-          this.error = String(error);
+          this.errors = String(error);
         }
-      } finally {
-        this.loading = false;
       }
     },
   },
