@@ -476,6 +476,7 @@
 
   <DeleteConfirmationModal
     :isOpen="isDeleteModalOpen"
+    :deleteText="'Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.'"
     @close="isDeleteModalOpen = false"
     @confirm="handleDeleteConfirm"
   />

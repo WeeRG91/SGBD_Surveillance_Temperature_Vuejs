@@ -36,7 +36,7 @@ export const useTransfertStore = defineStore("transfert", {
       } catch (error) {
         if (error.response) {
           if (error.response.data.message) {
-            this.errors = error.response.data.message || "Transfering element failed";
+            this.errors = error.response.data.message || "Transfering contenu failed";
             toast.addToast(error.response.data.message, "error");
           }
         } else if (error instanceof Error) {

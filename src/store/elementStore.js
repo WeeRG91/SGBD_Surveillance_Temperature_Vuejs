@@ -31,7 +31,6 @@ export const useElementStore = defineStore("element", {
     async fetchElement(id) {
       const toast = useToastStore();
       this.errors = null;
-      console.log("Fetching element with ID:", id);
       try {
         const response = await elementApi.getById(id);
         this.currentElement = response.data.element;
@@ -80,17 +79,22 @@ export const useElementStore = defineStore("element", {
         const response = await elementApi.update(id, data);
         this.fetchElements();
         this.fetchElement(id);
-        toast.addToast("Element mis à jour avec succès.");
+        toast.addToast("Element frigorifique mis à jour avec succès.");
       } catch (error) {
-        console.log(error);
         if (error.response) {
-          this.errors =
-            error.response.data.message || "Updating element failed";
-          toast.addToast(error.response.data.message, "error");
+          if (error.response.data.errors) {
+            this.errors = error.response.data.errors;
+            toast.addToast("Information invalide", "error");
+          } else {
+            this.errors = {
+              message: error.response.data.message || "Creating element failed",
+            };
+            toast.addToast(error.response.data.message, "error");
+          }
         } else if (error instanceof Error) {
-          this.errors = error.message;
+          this.errors = { message: error.message };
         } else {
-          this.errors = String(error);
+          this.errors = { message: String(error) };
         }
       }
     },
@@ -103,7 +107,7 @@ export const useElementStore = defineStore("element", {
         if (this.currentElement?.id === id) {
           this.currentElement = null;
         }
-        toast.addToast("Element supprimé avec succès.")
+        toast.addToast("Element supprimé avec succès.");
       } catch (error) {
         if (error.response) {
           this.errors =

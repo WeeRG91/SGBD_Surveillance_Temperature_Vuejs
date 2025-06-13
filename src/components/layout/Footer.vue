@@ -27,14 +27,14 @@
           </li>
           <li>
             <RouterLink
-              :to="{ name: 'element' }"
+              :to="{ name: 'elements' }"
               class="block md:text-lg py-2 px-3 hover:underline"
               >Elements</RouterLink
             >
           </li>
           <li>
-            <a href="#" class="block md:text-lg py-2 px-3 hover:underline"
-              >Emplacements</a
+            <RouterLink :to="{ name: 'emplacements' }" class="block md:text-lg py-2 px-3 hover:underline"
+              >Emplacements</RouterLink
             >
           </li>
         </ul>

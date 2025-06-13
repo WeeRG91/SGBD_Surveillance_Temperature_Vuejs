@@ -1,5 +1,7 @@
 <template>
+  <LoadingSkeleton v-if="isLoading"/>
   <Hero
+  v-if="!isLoading"
     :numberElements="numberElements"
     :percentNormalElements="percentNormalElements"
     :numberAlertes="numberAlertes"
@@ -12,6 +14,7 @@ import { computed, onMounted, ref } from "vue";
 import Hero from "../components/home/Hero.vue";
 import { useElementStore } from "../store/elementStore";
 import { useAlerteStore } from "../store/alerteStore";
+import LoadingSkeleton from "../components/LoadingSkeleton.vue";
 
 const elementStore = useElementStore();
 const alerteStore = useAlerteStore();

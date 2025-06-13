@@ -1,10 +1,7 @@
 <template>
   <div v-if="isOpen" class="fixed inset-0 z-50 overflow-y-auto">
     <!-- Background overlay -->
-    <div 
-      class="fixed inset-0 bg-black bg-opacity-25"
-      @click="closeModal"
-    ></div>
+    <div class="fixed inset-0 bg-black bg-opacity-25" @click="closeModal"></div>
 
     <!-- Modal container -->
     <div class="flex min-h-screen items-center justify-center p-4">
@@ -15,22 +12,28 @@
           class="absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-500"
           @click="closeModal"
         >
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
         <!-- Modal header -->
         <h3 class="text-lg font-medium leading-6 text-gray-900">
-          Ajouter un nouvel emplacement
+          Créer un nouvel emplacement
         </h3>
 
         <!-- Modal body -->
         <div class="mt-4">
-          <p class="text-sm text-gray-500 mb-4">
-            Ajout sous: <strong>{{ parentName }}</strong>
-          </p>
-
           <div class="mb-4">
             <label
               for="emplacementName"
@@ -64,7 +67,7 @@
             @click="submitForm"
             :disabled="!emplacementName"
           >
-            Ajouter
+            Créer
           </button>
         </div>
       </div>
@@ -78,14 +81,6 @@ import { ref } from "vue";
 const props = defineProps({
   isOpen: {
     type: Boolean,
-    required: true,
-  },
-  parentId: {
-    type: [String, Number],
-    required: true,
-  },
-  parentName: {
-    type: String,
     required: true,
   },
 });
@@ -102,10 +97,7 @@ const closeModal = () => {
 const submitForm = () => {
   if (!emplacementName.value) return;
 
-  emit("submit", {
-    parentId: props.parentId,
-    name: emplacementName.value,
-  });
+  emit("submit", emplacementName.value);
 
   emplacementName.value = "";
 };

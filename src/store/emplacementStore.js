@@ -1,117 +1,121 @@
 import { defineStore } from "pinia";
 import emplacementApi from "../api/emplacement";
+import { useToastStore } from "./toastStore";
 
 export const useEmplacementStore = defineStore("emplacement", {
   state: () => ({
     emplacements: [],
+    emplacementTree: [],
     currentEmplacement: null,
-    loading: false,
-    error: null,
+    errors: null,
   }),
   actions: {
     async fetchEmplacements() {
-      this.loading = true;
-      this.error = null;
+      const toast = useToastStore();
+      this.errors = null;
       try {
         const response = await emplacementApi.getAll();
         this.emplacements = response.data.emplacements;
       } catch (error) {
         if (error.response) {
-          this.error =
+          this.errors =
             error.response.data.message || "Fetching emplacements failed";
+          toast.addToast(error.response.data.message, "error");
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = error.message;
         } else {
-          this.error = String(error);
+          this.errors = String(error);
         }
-      } finally {
-        this.loading = false;
       }
     },
-    async fetchEmplacement(id) {
-      this.loading = true;
-      this.error = null;
+    async fetchEmplacementTree() {
+      const toast = useToastStore();
+      this.errors = null;
       try {
-        const response = await emplacementApi.getById(id);
-        this.currentEmplacement = response.data.emplacement;
+        const response = await emplacementApi.getEmplacementTree();
+        this.emplacementTree = response.data.emplacements;
       } catch (error) {
         if (error.response) {
-          this.error =
-            error.response.data.message || "Fetching emplacement failed";
+          this.errors =
+            error.response.data.message || "Fetching emplacement tree failed";
+          toast.addToast(error.response.data.message, "error");
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = error.message;
         } else {
-          this.error = String(error);
+          this.errors = String(error);
         }
-      } finally {
-        this.loading = false;
       }
     },
     async createEmplacement(data) {
-      this.loading = true;
-      this.error = null;
+      const toast = useToastStore();
+      this.errors = null;
       try {
-        const response = await emplacementApi.create(data);
-        this.emplacements = [...this.emplacements, response.data.result];
+        await emplacementApi.create(data);
+        this.fetchEmplacements();
+        this.fetchEmplacementTree();
+        toast.addToast("Emplacement créé avec succès.");
       } catch (error) {
         if (error.response) {
-          this.error =
-            error.response.data.message || "Creating emplacement failed";
+          if (error.response.data.errors) {
+            this.errors = error.response.data.errors;
+            toast.addToast("Information invalide", "error");
+          } else {
+            this.errors = {
+              message: error.response.data.message || "Creating emplacement failed",
+            };
+            toast.addToast(error.response.data.message, "error");
+          }
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = { message: error.message };
         } else {
-          this.error = String(error);
+          this.errors = { message: String(error) };
         }
-      } finally {
-        this.loading = false;
       }
     },
     async updateEmplacement(id, data) {
-      this.loading = true;
-      this.error = null;
+      const toast = useToastStore();
+      this.errors = null;
       try {
-        const response = await emplacementApi.update(id, data);
-        this.emplacements = this.emplacements.map((emplacement) =>
-          emplacement.id === id ? response.data.result : emplacement
-        );
-        if (this.currentEmplacement?.id === id) {
-          this.emplacement = response.data.result;
-        }
+        await emplacementApi.update(id, data);
+        this.fetchEmplacements();
+        this.fetchEmplacementTree();
+        toast.addToast("Emplacement modifié avec succès.");
       } catch (error) {
         if (error.response) {
-          this.error =
-            error.response.data.message || "Updating emplacement failed";
+          if (error.response.data.errors) {
+            this.errors = error.response.data.errors;
+            toast.addToast("Information invalide", "error");
+          } else {
+            this.errors = {
+              message: error.response.data.message || "Creating emplacement failed",
+            };
+            toast.addToast(error.response.data.message, "error");
+          }
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = { message: error.message };
         } else {
-          this.error = String(error);
+          this.errors = { message: String(error) };
         }
-      } finally {
-        this.loading = false;
       }
     },
     async deleteEmplacement(id) {
-      this.loading = true;
-      this.error = null;
+      const toast = useToastStore();
+      this.errors = null;
       try {
         await emplacementApi.delete(id);
-        this.emplacements = this.emplacements.filter(
-          (emplacement) => emplacement.id !== id
-        );
-        if (this.currentEmplacement?.id === id) {
-          this.currentEmplacement = null;
-        }
+        this.fetchEmplacements();
+        this.fetchEmplacementTree();
+        toast.addToast("Emplacement supprimé avec succès.");
       } catch (error) {
         if (error.response) {
-          this.error =
+          this.errors =
             error.response.data.message || "Deleting emplacement failed";
+          toast.addToast(error.response.data.message, "error");
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = error.message;
         } else {
-          this.error = String(error);
+          this.errors = String(error);
         }
-      } finally {
-        this.loading = false;
       }
     },
   },

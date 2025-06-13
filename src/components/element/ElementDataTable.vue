@@ -269,7 +269,8 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
               <div class="flex space-x-2">
                 <RouterLink
-                  :to="{ name: 'element-details', params: { id: item.id } }"
+                  :to="{ name: 'element-detail', params: { id: item.id } }"
+                  title="Voir plus"
                   class="text-indigo-600 hover:text-indigo-900"
                 >
                   <svg
@@ -278,13 +279,17 @@
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                     <path
-                      d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                      fill-rule="evenodd"
+                      d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                      clip-rule="evenodd"
                     />
                   </svg>
                 </RouterLink>
                 <button
                   @click.stop="openDeleteModal(item)"
+                  title="Supprimer"
                   class="text-red-600 hover:text-red-900"
                 >
                   <svg
@@ -387,6 +392,7 @@
 
     <DeleteConfirmationModal
       :isOpen="isDeleteModalOpen"
+      :deleteText="'Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.'"
       @close="isDeleteModalOpen = false"
       @confirm="handleDeleteConfirm"
     />
@@ -641,7 +647,7 @@ const handleCreateFormSubmit = () => {
 const openDeleteModal = (item) => {
   selectedItemToDelete.value = item;
   isDeleteModalOpen.value = true;
-}
+};
 
 const handleDeleteConfirm = async () => {
   if (selectedItemToDelete.value) {
@@ -653,5 +659,5 @@ const handleDeleteConfirm = async () => {
       console.error("Erreur deleting element:", error);
     }
   }
-}
+};
 </script>

@@ -1,115 +1,98 @@
 import { defineStore } from "pinia";
 import typeElementApi from "../api/typeElement";
+import { useToastStore } from "./toastStore";
 
 export const useTypeElementStore = defineStore("typeElement", {
   state: () => ({
     typeElements: [],
-    currentTypeElement: null,
-    loading: false,
-    error: null,
+    errors: null,
   }),
   actions: {
     async fetchTypeElements() {
-      this.loading = true;
-      this.error = null;
+      const toast = useToastStore();
+      this.errors = null;
       try {
         const response = await typeElementApi.getAll();
         this.typeElements = response.data.results;
       } catch (error) {
         if (error.response) {
-          this.error =
-            error.response.data.message || "Fetching element types failed";
+          this.errors =
+            error.response.data.message || "Fetching types failed";
+          toast.addToast(error.response.data.message);
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = error.message;
         } else {
-          this.error = String(error);
+          this.errors = String(error);
         }
-      } finally {
-        this.loading = false;
-      }
-    },
-    async fetchTypeElement(id) {
-      this.loading = true;
-      this.error = null;
-      try {
-        const response = await typeElementApi.getById(id);
-        this.currentTypeElement = response.data.result;
-      } catch (error) {
-        if (error.response) {
-          this.error =
-            error.response.data.message || "Fetching element type failed";
-        } else if (error instanceof Error) {
-          this.error = error.message;
-        } else {
-          this.error = String(error);
-        }
-      } finally {
-        this.loading = false;
       }
     },
     async createTypeElement(data) {
-      this.loading = true;
-      this.error = null;
+      const toast = useToastStore();
+      this.errors = null;
       try {
-        const response = await typeElementApi.create(data);
-        this.typeElements = [...this.typeElements, response.data.result];
+        await typeElementApi.create(data);
+        this.fetchTypeElements();
+        toast.addToast("Type créé avec succès.");
       } catch (error) {
         if (error.response) {
-          this.error =
-            error.response.data.message || "Creating type element failed";
+          if (error.response.data.errors) {
+            this.errors = error.response.data.errors;
+            toast.addToast("Information invalide", "error");
+          } else {
+            this.errors = {
+              message: error.response.data.message || "Creating type failed",
+            };
+            toast.addToast(error.response.data.message, "error");
+          }
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = { message: error.message };
         } else {
-          this.error = String(error);
+          this.errors = { message: String(error) };
         }
-      } finally {
-        this.loading = false;
       }
     },
     async updateTypeElement(id, data) {
-      this.loading = true;
-      this.error = null;
+      const toast = useToastStore();
+      this.errors = null;
       try {
-        const response = await typeElementApi.update(id, data);
-        this.typeElements = this.typeElements.map((type) =>
-          type.id === id ? response.data.result : type
-        );
-        if (this.currentTypeElement?.id === id) {
-          this.createTypeElement = response.data.result;
-        }
+        await typeElementApi.update(id, data);
+        this.fetchTypeElements();
+        toast.addToast("Type mis à jour avec succès.");
       } catch (error) {
         if (error.response) {
-          this.error =
-            error.response.data.message || "Updating type element failed";
+          if (error.response.data.errors) {
+            this.errors = error.response.data.errors;
+            toast.addToast("Information invalide", "error");
+          } else {
+            this.errors = {
+              message: error.response.data.message || "Updating type failed",
+            };
+            toast.addToast(error.response.data.message, "error");
+          }
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = { message: error.message };
         } else {
-          this.error = String(error);
+          this.errors = { message: String(error) };
         }
-      } finally {
-        this.loading = false;
       }
     },
     async deleteTypeElement(id) {
-      this.loading = true;
-      this.error = null;
+      const toast = useToastStore();
+      this.errors = null;
       try {
         await typeElementApi.delete(id);
-        this.typeElements = this.typeElements.filter((type) => type.id !== id);
-        if (this.currentTypeElement?.id === id) {
-          this.currentTypeElement = null;
-        }
+        this.fetchTypeElements();
+        toast.addToast("Type supprimé avec succès.");
       } catch (error) {
         if (error.response) {
-          this.error =
-            error.response.data.message || "Deleting type element failed";
+          this.errors =
+            error.response.data.message || "Deleting type failed";
+          toast.addToast(error.response.data.message, "error");
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = error.message;
         } else {
-          this.error = String(error);
+          this.errors = String(error);
         }
-      } finally {
-        this.error = false;
       }
     },
   },

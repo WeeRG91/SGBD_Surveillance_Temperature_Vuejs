@@ -178,7 +178,7 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <button
                   v-if="temp.type_alerte && !temp.traitee"
-                  @click="handleAlerte(temp.id)"
+                  @click="openAlerteHandleModal(temp.id_alerte)"
                   class="text-blue-600 hover:text-blue-800"
                 >
                   Marquer comme traitée
@@ -190,6 +190,12 @@
       </div>
     </div>
   </div>
+
+  <AlertHandleModal
+    :isOpen="isAlerteHandleModalOpen"
+    @close="isAlerteHandleModalOpen = false"
+    @confirm="handleAlerte"
+  />
 </template>
 
 <script setup>
@@ -200,13 +206,18 @@ import { useElementStore } from "../store/elementStore";
 import { subDays, subWeeks, subMonths, subYears, format } from "date-fns";
 import TemperatureChart from "../components/temperature/TemperatureChart.vue";
 import LoadingSkeleton from "../components/LoadingSkeleton.vue";
+import AlertHandleModal from "../components/temperature/AlertHandleModal.vue";
+import { useAlerteStore } from "../store/alerteStore";
 
 const route = useRoute();
 const temperatureStore = useTemperatureStore();
 const elementStore = useElementStore();
+const alerteStore = useAlerteStore();
 
 const isLoading = ref(false);
 const selectedPeriod = ref("week");
+const isAlerteHandleModalOpen = ref(false);
+const selectedAlerteId = ref(null);
 const startDate = ref("");
 const endDate = ref("");
 
@@ -311,6 +322,25 @@ const formatDateTime = (dateString) => {
     minute: "2-digit",
   };
   return new Date(dateString).toLocaleDateString("fr-FR", options);
+};
+
+const openAlerteHandleModal = (id_alerte) => {
+  selectedAlerteId.value = id_alerte;
+  isAlerteHandleModalOpen.value = true;
+};
+
+const handleAlerte = async () => {
+  if (selectedAlerteId.value) {
+    try {
+      await alerteStore.updateAlerte(selectedAlerteId.value.id, {
+        traitee: true,
+      });
+      selectedAlerteId.value = null;
+      isAlerteHandleModalOpen.value = false;
+    } catch (error) {
+      console.error("Handling alerte failed:", error);
+    }
+  }
 };
 
 onMounted(async () => {

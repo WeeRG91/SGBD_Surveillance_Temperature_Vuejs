@@ -13,7 +13,7 @@
           Surveillance intelligente de vos environnements frigorifiques
         </p>
         <RouterLink
-          :to="{ name: 'element' }"
+          :to="{ name: 'elements' }"
           class="bg-[var(--bg-secondary-color)] text-[var(--primary-color)] px-8 py-3 rounded-lg font-semibold hover:bg-[var(--bg-primary-color)] hover:text-white transition duration-300"
         >
           Démarrer la surveillance

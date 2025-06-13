@@ -10,14 +10,16 @@
       <!-- Modal Header -->
       <div class="p-4 border-b">
         <h3 class="text-lg font-semibold text-gray-900">
-          Confirmer la suppression
+          Traitement de l'alerte
         </h3>
       </div>
 
       <!-- Modal Body -->
       <div class="p-4">
         <p class="text-gray-600">
-          {{ deleteText }}
+          La température de l'élément réfrigérant n'est pas dans la plage de
+          température. <br/>
+          Souhaitez-vous confirmer le traitement de cette alerte ?
         </p>
       </div>
 
@@ -31,9 +33,9 @@
         </button>
         <button
           @click="confirmDelete"
-          class="px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
+          class="px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
         >
-          <span v-if="!isLoading">Supprimer</span>
+          <span v-if="!isLoading">Traiter</span>
           <span v-else class="flex items-center">
             <svg
               class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
@@ -55,7 +57,7 @@
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            Supprimer...
+            Traiter...
           </span>
         </button>
       </div>
@@ -69,10 +71,6 @@ import { ref } from "vue";
 const props = defineProps({
   isOpen: {
     type: Boolean,
-    required: true,
-  },
-  deleteText: {
-    type: String,
     required: true,
   },
 });

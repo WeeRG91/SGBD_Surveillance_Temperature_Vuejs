@@ -1,7 +1,7 @@
 <template>
   <li>
     <div
-      class="flex items-center py-2 px-4 hover:bg-gray-50 rounded cursor-pointer"
+      class="group flex items-center py-2 px-4 hover:bg-gray-50 rounded cursor-pointer"
       :style="{ paddingLeft: `${depth * 1.5 + 1}rem` }"
       @click="toggleExpend"
     >
@@ -24,14 +24,14 @@
 
       <span class="font-medium">{{ node.nom }}</span>
 
-      <button 
-        class="ml-2"
-        @click.stop="isAddChildEmplacementModalOpen = true"
-        title="Add child emplacement"
+      <button
+        class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        @click.stop="isAddEmplacementModalOpen = true"
+        title="Ajouter emplacement"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4 text-gray-500 hover:text-gray-700"
+          class="h-5 w-5 text-gray-500 hover:text-green-700"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -44,6 +44,48 @@
           />
         </svg>
       </button>
+
+      <button
+        @click.stop="isEditEmplacementModalOpen = true"
+        title="Modifier emplacement"
+        class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 text-gray-500 hover:text-blue-700"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+          />
+        </svg>
+      </button>
+
+      <button
+        @click.stop="isDeleteEmplacementModalOpen = true"
+        title="Supprimer emplacement"
+        class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 text-gray-500 hover:text-red-600"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+          />
+        </svg>
+      </button>
     </div>
 
     <!-- Elements list -->
@@ -51,11 +93,11 @@
       <li
         v-for="element in node.elements"
         :key="element.id"
-        class="py-1 px-4 text-sm text-gray-600"
+        class="py-1 px-4 text-sm text-gray-600 hover:text-blue-800"
         :style="{ paddingLeft: `${depth * 1.5 + 2}rem` }"
       >
         <RouterLink
-          :to="{ name: 'element-details', params: { id: element.id } }"
+          :to="{ name: 'element-detail', params: { id: element.id } }"
           class="flex items-center"
         >
           <svg
@@ -90,12 +132,28 @@
       />
     </ul>
 
-    <AddChildrenEmplacementModal
-      :isOpen="isAddChildEmplacementModalOpen"
-      :parentId="node.id"
+    <AddChildEmplacementModal
+      v-if="isAddEmplacementModalOpen"
+      :isOpen="isAddEmplacementModalOpen"
       :parentName="node.nom"
-      @close="isAddChildEmplacementModalOpen = false"
+      @close="isAddEmplacementModalOpen = false"
       @submit="handleAddChildEmplacement"
+    />
+
+    <EditEmplacementModal
+      v-if="isEditEmplacementModalOpen"
+      :isOpen="isEditEmplacementModalOpen"
+      :emplacementName="node.nom"
+      @close="isEditEmplacementModalOpen = false"
+      @submit="handleEditEmplacement"
+    />
+
+    <DeleteConfirmationModal
+      v-if="isDeleteEmplacementModalOpen"
+      :isOpen="isDeleteEmplacementModalOpen"
+      :deleteText="'Êtes-vous sûr de vouloir supprimer cet emplacement ? Cette action est irréversible.'"
+      @close="isDeleteEmplacementModalOpen = false"
+      @confirm="handleDeleteEmplacement"
     />
   </li>
 </template>
@@ -103,7 +161,10 @@
 <script setup>
 import { ref } from "vue";
 import { RouterLink } from "vue-router";
-import AddChildrenEmplacementModal from "./AddChildrenEmplacementModal.vue";
+import AddChildEmplacementModal from "./AddChildEmplacementModal.vue";
+import { useEmplacementStore } from "../../store/emplacementStore";
+import EditEmplacementModal from "./EditEmplacementModal.vue";
+import DeleteConfirmationModal from "../DeleteConfirmationModal.vue";
 
 const props = defineProps({
   node: {
@@ -116,15 +177,51 @@ const props = defineProps({
   },
 });
 
+const emplacementStore = useEmplacementStore();
+
 const isExpanded = ref(false);
-const isAddChildEmplacementModalOpen = ref(false);
+const isAddEmplacementModalOpen = ref(false);
+const isEditEmplacementModalOpen = ref(false);
+const isDeleteEmplacementModalOpen = ref(false);
 
 const toggleExpend = () => {
   console.log("toggleExpand");
   isExpanded.value = !isExpanded.value;
 };
 
-const handleAddChildEmplacement = () => {
-  console.log("submit child emplacement")
-}
+const handleAddChildEmplacement = async (emplacementName) => {
+  try {
+    await emplacementStore.createEmplacement({
+      nom: emplacementName,
+      parent_id: props.node.id,
+    });
+
+    isAddEmplacementModalOpen.value = false;
+    isExpanded.value = ref(true);
+  } catch (error) {
+    console.log("Storing child emplacement failed");
+  }
+};
+
+const handleEditEmplacement = async (editedEmplacementName) => {
+  try {
+    await emplacementStore.updateEmplacement(props.node.id, {
+      nom: editedEmplacementName,
+    });
+
+    isEditEmplacementModalOpen.value = false;
+  } catch (error) {
+    console.log("Editing emplacement failed");
+  }
+};
+
+const handleDeleteEmplacement = async () => {
+  try {
+    await emplacementStore.deleteEmplacement(props.node.id);
+
+    isDeleteEmplacementModalOpen.value = false;
+  } catch (error) {
+    console.log("Editing emplacement failed");
+  }
+};
 </script>

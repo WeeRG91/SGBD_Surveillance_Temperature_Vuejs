@@ -4,6 +4,9 @@ const emplacementApi = {
   getAll() {
     return api.get("/emplacements");
   },
+  getEmplacementTree() {
+    return api.get("/emplacements/emplacement-tree");
+  },
   getById(id) {
     return api.get(`/emplacements/${id}`);
   },
