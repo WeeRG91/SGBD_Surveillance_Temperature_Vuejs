@@ -1,8 +1,8 @@
 import api from "./axios";
 
 const transfertApi = {
-  getAll() {
-    return api.get("/transferts");
+  getTransfertsByElementId(id) {
+    return api.get(`/transferts/${id}`);
   },
   transfer(data) {
     return api.post("/transferts", data);

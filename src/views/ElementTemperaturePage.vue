@@ -59,10 +59,9 @@
           <select
             id="period"
             v-model="selectedPeriod"
-            @change="handlePeriodChange"
+            @change.stop="handlePeriodChange"
             class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
           >
-            <option value="day">Jour</option>
             <option value="week">Semaine</option>
             <option value="month">Mois</option>
             <option value="year">Année</option>
@@ -82,7 +81,7 @@
               type="date"
               id="startDate"
               v-model="startDate"
-              @change="fetchDataForCustomPeriod"
+              @change.stop="fetchDataForCustomPeriod"
               class="ml-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
             />
           </div>
@@ -94,7 +93,7 @@
               type="date"
               id="endDate"
               v-model="endDate"
-              @change="fetchDataForCustomPeriod"
+              @change.stop="fetchDataForCustomPeriod"
               class="ml-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
             />
           </div>
@@ -206,7 +205,7 @@ import { useElementStore } from "../store/elementStore";
 import { subDays, subWeeks, subMonths, subYears, format } from "date-fns";
 import TemperatureChart from "../components/temperature/TemperatureChart.vue";
 import LoadingSkeleton from "../components/LoadingSkeleton.vue";
-import AlertHandleModal from "../components/temperature/AlertHandleModal.vue";
+import AlertHandleModal from "../components/alerte/AlertHandleModal.vue";
 import { useAlerteStore } from "../store/alerteStore";
 
 const route = useRoute();
@@ -225,8 +224,6 @@ const temperatures = computed(() => temperatureStore.temperatures);
 const element = computed(() => elementStore.currentElement);
 const currentPeriodLabel = computed(() => {
   switch (selectedPeriod.value) {
-    case "day":
-      return "les dernières 24 heures";
     case "week":
       return "la dernière semaine";
     case "month":
@@ -243,11 +240,6 @@ const currentPeriodLabel = computed(() => {
 const getDateRange = () => {
   const now = new Date();
   switch (selectedPeriod.value) {
-    case "day":
-      return {
-        start: subDays(now, 1),
-        end: now,
-      };
     case "week":
       return {
         start: subWeeks(now, 1),
@@ -288,10 +280,14 @@ const fetchTemperatures = async () => {
   try {
     isLoading.value = true;
     const range = getDateRange();
+    const start = new Date(range.start);
+    start.setHours(start.getHours() + 2);
+    const end = new Date(range.end);
+    end.setHours(end.getHours() + 2)
     await temperatureStore.fetchTemperaturesWithAlerteByElementId({
       id_element: route.params.id,
-      date_start: range.start,
-      date_end: range.end,
+      date_start: start,
+      date_end: end,
     });
   } catch (error) {
     console.error("Error fetching temperatures:", error);
@@ -321,7 +317,7 @@ const formatDateTime = (dateString) => {
     hour: "2-digit",
     minute: "2-digit",
   };
-  return new Date(dateString).toLocaleDateString("fr-FR", options);
+  return new Date(dateString).toLocaleString('fr-FR', options);
 };
 
 const openAlerteHandleModal = (id_alerte) => {
@@ -332,9 +328,10 @@ const openAlerteHandleModal = (id_alerte) => {
 const handleAlerte = async () => {
   if (selectedAlerteId.value) {
     try {
-      await alerteStore.updateAlerte(selectedAlerteId.value.id, {
-        traitee: true,
+      await alerteStore.updateAlerte(selectedAlerteId.value, {
+        traitee: 1,
       });
+      await fetchTemperatures();
       selectedAlerteId.value = null;
       isAlerteHandleModalOpen.value = false;
     } catch (error) {

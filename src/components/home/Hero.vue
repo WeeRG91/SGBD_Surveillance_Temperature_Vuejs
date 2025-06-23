@@ -60,30 +60,38 @@
         </h2>
 
         <div
-          v-if="threeLatestAlertes.length !== 0"
+          v-if="latestAlertes.length !== 0"
           class="bg-white rounded-lg shadow-md overflow-hidden"
         >
-          <div class="divide-y divide-gray-200">
-            <div v-for="alerte in threeLatestAlertes" class="p-4 hover:bg-gray-100 transition flex items-center">
+          <div class="divide-y divide-gray-200 max-h-56 overflow-y-auto">
+            <div
+              v-for="alerte in latestAlertes"
+              class="p-4 hover:bg-gray-100 transition flex items-center"
+            >
               <div class="w-3 h-3 rounded-full bg-red-500 mr-4"></div>
               <div>
                 <p class="font-semibold">{{ alerte.type_alerte }}</p>
                 <p class="text-sm text-gray-500">
-                  {{ alerte.element_nom }} ({{ alerte.element_temp_min }} - {{ alerte.element_temp_max }}) - {{ alerte.temperature }}°C le {{ alerte.temp_date_heure }}
+                  {{ alerte.element_nom }} ({{ alerte.element_temp_min }} -
+                  {{ alerte.element_temp_max }}) - {{ alerte.temperature }}°C le
+                  {{ formatDate(alerte.temp_date_heure) }}
                 </p>
               </div>
             </div>
           </div>
 
           <div class="text-center text-[var(--primary-color)] py-4 bg-gray-50">
-            <button class="text--blue-600 font-medium hover:underline">
+            <RouterLink
+              :to="{ name: 'alertes' }"
+              class="text--blue-600 font-medium hover:underline"
+            >
               Voir toutes les alertes
-            </button>
+            </RouterLink>
           </div>
         </div>
 
         <div
-          v-if="threeLatestAlertes.length === 0"
+          v-if="latestAlertes.length === 0"
           class="bg-white rounded-lg shadow-md overflow-hidden"
         >
           <div
@@ -119,11 +127,23 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  threeLatestAlertes: {
+  latestAlertes: {
     type: Array,
     required: true,
   },
 });
+
+const formatDate = (dateString) => {
+  if (!dateString) return "Non spécifié";
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return new Date(dateString).toLocaleDateString("fr-FR", options);
+};
 </script>
 
 <style scoped></style>

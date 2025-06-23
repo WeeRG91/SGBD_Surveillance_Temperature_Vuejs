@@ -2,7 +2,7 @@
   <div class="container mx-auto p-4">
     <LoadingSkeleton v-if="isLoading" />
     <ElementdetailCard
-      v-if="selectedElement"
+      v-if="selectedElement && !isLoading"
       :element="selectedElement"
       @delete="handleDelete"
     />

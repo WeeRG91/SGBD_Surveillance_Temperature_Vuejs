@@ -444,7 +444,7 @@
             <button
               v-if="currentStep < totalSteps"
               type="button"
-              @click="nextStep"
+              @click.stop="nextStep"
               class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[var(--primary-color)] text-base font-medium text-white hover:bg-[var(--bg-primary-color)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
             >
               Suivant
@@ -483,7 +483,7 @@
             <button
               v-if="currentStep > 1"
               type="button"
-              @click="prevStep"
+              @click.stop="prevStep"
               class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
             >
               Précédent
@@ -491,7 +491,7 @@
             <button
               type="button"
               class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-              @click="closeModal"
+              @click.stop="closeModal"
             >
               Annuler
             </button>

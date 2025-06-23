@@ -1,49 +1,44 @@
 import { defineStore } from "pinia";
 import alerteApi from "../api/alerte";
+import { useToastStore } from "./toastStore";
 
 export const useAlerteStore = defineStore("alerte", {
   state: () => ({
     alertes: [],
-    loading: false,
-    error: null,
+    errors: null,
   }),
   actions: {
     async fetchAlertes() {
-      this.loading = true;
-      this.error = null;
+      const toast = useToastStore();
+      this.errors = null;
       try {
         const response = await alerteApi.getAll();
         this.alertes = response.data.alertes;
       } catch (error) {
         if (error.response) {
-          this.error = error.response.data.message || "Fetching alertes failed";
+          this.errors = error.response.data.message || "Fetching alertes failed";
+          toast.addToast(error.response.data.message, "error");
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = error.message;
         } else {
-          this.error = String(error);
+          this.errors = String(error);
         }
-      } finally {
-        this.loading = false;
       }
     },
     async updateAlerte(id, data) {
-      this.loading = true;
-      this.error = null;
+      const toast = useToastStore();
+      this.errors = null;
       try {
         const response = await alerteApi.update(id, data);
-        this.alertes = this.alertes.map((alerte) =>
-          alerte.id === id ? response.data.alerte : alerte
-        );
       } catch (error) {
         if (error.response) {
-          this.error = error.response.data.message || "Updating alerte failed";
+          this.errors = error.response.data.message || "Updating alerte failed";
+          toast.addToast(error.response.data.message, "error");
         } else if (error instanceof Error) {
-          this.error = error.message;
+          this.errors = error.message;
         } else {
-          this.error = String(error);
+          this.errors = String(error);
         }
-      } finally {
-        this.loading = false;
       }
     },
   },

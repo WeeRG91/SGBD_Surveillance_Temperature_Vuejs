@@ -34,7 +34,7 @@
         </div>
 
         <button
-          @click="() => (isCreateModalOpen = true)"
+          @click.stop="() => (isCreateModalOpen = true)"
           class="bg-[var(--bg-secondary-color)] text-[var(--primary-color)] px-8 py-2 rounded-md font-semibold hover:bg-[var(--primary-color)] hover:text-white transition duration-300"
         >
           Ajouter
@@ -47,7 +47,7 @@
       <!-- Mobile: Collapsible Filters -->
       <div class="md:hidden mb-3">
         <button
-          @click="showMobileFilters = !showMobileFilters"
+          @click.stop="showMobileFilters = !showMobileFilters"
           class="flex items-center justify-between w-full px-4 py-2 bg-gray-100 rounded-lg"
         >
           <span class="font-medium">Filtres</span>
@@ -173,7 +173,7 @@
           <!-- Reset Button -->
           <div class="flex items-end">
             <button
-              @click="resetFilters"
+              @click.stop="resetFilters"
               class="w-full h-[42px] flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
             >
               <svg
@@ -207,7 +207,7 @@
               :key="index"
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider cursor-pointer"
-              @click="sortBy(column.key)"
+              @click.stop="sortBy(column.key)"
             >
               <div class="flex items-center">
                 {{ column.label }}
@@ -434,7 +434,6 @@ const props = defineProps({
   },
 });
 
-// Reactive state
 const searchTerm = ref("");
 const itemsPerPage = ref(10);
 const currentPage = ref(1);
@@ -593,7 +592,6 @@ const pages = computed(() => {
   return pages;
 });
 
-// Methods
 const sortBy = (key) => {
   if (sortKey.value === key) {
     sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";

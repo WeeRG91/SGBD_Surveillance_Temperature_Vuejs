@@ -4,7 +4,9 @@
     <div class="bg-gradient-to-r from-[var(--primary-color)] to-blue-800 p-6">
       <div class="flex justify-between items-start">
         <div>
-          <h1 class="text-2xl font-bold text-white">{{ element.nom }}</h1>
+          <h1 class="text-xl md:text-2xl font-bold text-white">
+            {{ element.nom }}
+          </h1>
           <div class="flex items-center mt-2">
             <span
               class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
@@ -32,10 +34,39 @@
             </span>
           </div>
         </div>
-        <div class="bg-white p-2 rounded-lg shadow">
-          <div class="text-xs text-gray-500">QR Code</div>
-          <div class="text-sm font-mono">
-            {{ element.qr_code || "Non spécifié" }}
+
+        <!-- QR Code Image -->
+        <div class="relative group">
+          <div class="relative w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28">
+            <img
+              :src="element.qr_code"
+              alt="QR Code"
+              class="w-full h-full p-1 border border-gray-200 rounded-sm bg-white"
+            />
+            <div
+              class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-sm"
+            >
+              <button
+                @click.stop="downloadQRCode(element.qr_code, element.nom)"
+                class="text-white bg-white hover:bg-gray-200 rounded-full p-2 transition-colors"
+                title="Télécharger QR Code"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 text-gray-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -314,9 +345,7 @@
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {{ formatDate(hist.date_modification) }}
                   </td>
-                  <td
-                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 capitalize"
-                  >
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {{ hist.champ_modifie }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -335,6 +364,117 @@
               class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500"
             >
               Voir tous les historiques
+              <svg
+                class="ml-1 w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                ></path>
+              </svg>
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transfer History Section -->
+      <div class="mb-8" v-if="transferts && transferts.length > 0">
+        <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
+          Historique des transferts
+        </h2>
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Date
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Type
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Élément source
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Élément destination
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr
+                  v-for="transfert in transferts
+                    .sort(
+                      (a, b) =>
+                        new Date(b.date_transfert) - new Date(a.date_transfert)
+                    )
+                    .slice(0, 3)"
+                  :key="transfert.id"
+                >
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ formatDate(transfert.date_transfert) }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    {{
+                      transfert.element_source_id === element.id
+                        ? "Sortie"
+                        : "Entrée"
+                    }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <RouterLink
+                      v-if="transfert.element_source_id !== element.id"
+                      :to="{
+                        name: 'element-detail',
+                        params: { id: transfert.element_source_id },
+                      }"
+                      class="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {{ transfert.element_source_nom }}
+                    </RouterLink>
+                    <span v-else class="text-gray-900">
+                      {{ transfert.element_source_nom }} (cet élément)
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <RouterLink
+                      v-if="transfert.element_destination_id !== element.id"
+                      :to="{
+                        name: 'element-detail',
+                        params: { id: transfert.element_destination_id },
+                      }"
+                      class="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {{ transfert.element_destination_nom }}
+                    </RouterLink>
+                    <span v-else class="text-gray-900">
+                      {{ transfert.element_destination_nom }} (cet élément)
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="px-6 py-3 bg-gray-50 text-right">
+            <RouterLink
+              :to="{ name: 'element-transfer', params: { id: element.id } }"
+              class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500"
+            >
+              Voir tous les transferts
               <svg
                 class="ml-1 w-4 h-4"
                 fill="none"
@@ -393,6 +533,7 @@
 
         <!-- Transfer Button -->
         <button
+          v-if="element.etat === 'En panne'"
           @click="isTransferModalOpen = true"
           class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center flex-1 sm:flex-none justify-center"
         >
@@ -484,10 +625,6 @@
   <ElementEditModal
     :isOpen="isEditModalOpen"
     :element="element"
-    :types="types"
-    :etats="etats"
-    :usages="usages"
-    :emplacements="emplacements"
     @close="isEditModalOpen = false"
     @update="handleUpdateFormSubmit"
   />
@@ -496,15 +633,12 @@
 <script setup>
 import { computed, defineProps, onMounted, ref } from "vue";
 import ElementEditModal from "./ElementEditModal.vue";
-import { useEmplacementStore } from "../../store/emplacementStore";
-import { useEtatElementStore } from "../../store/etatElementStore";
-import { useTypeElementStore } from "../../store/typeElementStore";
-import { useUsageStore } from "../../store/usageStore";
 import DeleteConfirmationModal from "../DeleteConfirmationModal.vue";
 import { useElementStore } from "../../store/elementStore";
 import { RouterLink, useRouter } from "vue-router";
 import TransfertContenuModal from "../transfert/TransfertContenuModal.vue";
 import TemperatureAddModal from "../temperature/TemperatureAddModal.vue";
+import { useTransfertStore } from "../../store/transfertStore";
 
 const props = defineProps({
   element: {
@@ -520,23 +654,14 @@ const isDeleteModalOpen = ref(false);
 const isTransferModalOpen = ref(false);
 const isTemperatureModalOpen = ref(false);
 const isLoading = ref(false);
-const types = computed(() => typeStore.typeElements);
-const usages = computed(() => usageStore.usages);
-const etats = computed(() => etatStore.etatElements);
-const emplacements = computed(() => emplacementStore.emplacements);
+const transferts = computed(() => transfertStore.transferts);
 
-const emplacementStore = useEmplacementStore();
-const etatStore = useEtatElementStore();
-const typeStore = useTypeElementStore();
-const usageStore = useUsageStore();
 const elementStore = useElementStore();
+const transfertStore = useTransfertStore();
 
 onMounted(async () => {
   isLoading.value = true;
-  await emplacementStore.fetchEmplacements();
-  await etatStore.fetchEtatElements();
-  await typeStore.fetchTypeElements();
-  await usageStore.fetchUsages();
+  await transfertStore.fetchTransfertsByElementId(props.element.id);
   isLoading.value = false;
 });
 
@@ -573,6 +698,15 @@ const handleDeleteConfirm = async () => {
 
 const handleUpdateFormSubmit = () => {
   isEditModalOpen.value = false;
+};
+
+const downloadQRCode = (qrCodeData, fileName) => {
+  const link = document.createElement("a");
+  link.href = qrCodeData;
+  link.download = `${fileName || "element"}_qrcode.png`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 </script>
 

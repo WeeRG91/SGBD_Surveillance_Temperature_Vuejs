@@ -221,7 +221,6 @@ const filteredData = computed(() => {
 });
 
 const sortedAndFilteredData = computed(() => {
-  // Create a copy of the filtered data
   const data = [...filteredData.value];
 
   if (!sortKey.value) return data;
@@ -230,13 +229,11 @@ const sortedAndFilteredData = computed(() => {
     let valueA = a[sortKey.value];
     let valueB = b[sortKey.value];
 
-    // Handle numeric sorting
     if (!isNaN(valueA) && !isNaN(valueB)) {
       valueA = Number(valueA);
       valueB = Number(valueB);
     }
 
-    // Handle string sorting
     if (typeof valueA === "string" && typeof valueB === "string") {
       valueA = valueA.toLowerCase();
       valueB = valueB.toLowerCase();

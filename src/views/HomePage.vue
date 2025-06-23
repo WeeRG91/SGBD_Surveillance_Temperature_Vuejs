@@ -5,7 +5,7 @@
     :numberElements="numberElements"
     :percentNormalElements="percentNormalElements"
     :numberAlertes="numberAlertes"
-    :threeLatestAlertes="threeLatestAlertes"
+    :latestAlertes="latestAlertes"
   />
 </template>
 
@@ -35,12 +35,12 @@ const percentNormalElements = computed(() => {
 
 const numberAlertes = computed(() => alerteStore.alertes.length);
 
-const threeLatestAlertes = computed(() => {
+const latestAlertes = computed(() => {
   if (!alerteStore.alertes || alerteStore.alertes.length === 0) return [];
 
   return [...alerteStore.alertes]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    .slice(0, 3);
+    .slice(0, 10);
 });
 
 onMounted(async () => {

@@ -26,13 +26,13 @@
       <!-- Modal Footer -->
       <div class="p-4 border-t flex justify-end space-x-3">
         <button
-          @click="closeModal"
+          @click.stop="closeModal"
           class="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
         >
           Annuler
         </button>
         <button
-          @click="confirmDelete"
+          @click.stop="confirmDelete"
           class="px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
         >
           <span v-if="!isLoading">Traiter</span>

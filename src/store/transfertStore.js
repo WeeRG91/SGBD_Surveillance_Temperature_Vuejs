@@ -8,11 +8,11 @@ export const useTransfertStore = defineStore("transfert", {
     errors: null,
   }),
   actions: {
-    async fetchTransferts() {
+    async fetchTransfertsByElementId(id) {
       const toast = useToastStore();
       this.errors = null;
       try {
-        const response = await transfertApi.getAll();
+        const response = await transfertApi.getTransfertsByElementId(id);
         this.transferts = response.data.transferts;
       } catch (error) {
         if (error.response) {

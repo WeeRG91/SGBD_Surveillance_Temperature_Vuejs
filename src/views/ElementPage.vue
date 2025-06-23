@@ -74,7 +74,7 @@ const tableColumns = ref([
     key: "remplissage",
     label: "Remplissage",
     sortable: true,
-    transform: (value) => (value === "Plein" ? "🟢 Plein" : "⚪ Vide"),
+    transform: (value) => (value === "Plein" ? "🔴 Plein" : "⚪ Vide"),
   },
 ]);
 

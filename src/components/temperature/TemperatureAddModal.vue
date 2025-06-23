@@ -25,18 +25,6 @@
             placeholder="Entrez la température"
           />
         </div>
-
-        <!-- <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Date/Heure
-          </label>
-          <input
-            type="datetime-local"
-            disabled
-            v-model="dateTimeValue"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div> -->
       </div>
 
       <div

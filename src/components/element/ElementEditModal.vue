@@ -15,13 +15,11 @@
             <h2 class="text-lg sm:text-xl font-bold text-white truncate">
               Modifier l'élément
             </h2>
-            <div
-              class="flex mt-2 space-x-1 overflow-auto pb-1 hide-scrollbar"
-            >
+            <div class="flex mt-2 space-x-1 overflow-auto pb-1 hide-scrollbar">
               <button
                 v-for="(step, index) in steps"
                 :key="index"
-                @click="currentStep = index"
+                @click.stop="currentStep = index"
                 class="flex-shrink-0 px-2 py-1 text-xs rounded-full transition-colors whitespace-nowrap"
                 :class="{
                   'bg-white text-blue-800': currentStep === index,
@@ -35,7 +33,7 @@
             </div>
           </div>
           <button
-            @click="closeModal"
+            @click.stop="closeModal"
             class="flex-shrink-0 ml-2 text-white hover:text-gray-200"
           >
             <svg
@@ -385,7 +383,7 @@
           <div class="flex justify-between pt-4 border-t">
             <button
               type="button"
-              @click="prevStep"
+              @click.stop="prevStep"
               v-show="currentStep > 0"
               class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
             >
@@ -395,14 +393,14 @@
             <!-- Spacer -->
             <button
               type="button"
-              @click="closeModal"
+              @click.stop="closeModal"
               class="px-4 py-2 mx-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
             >
               Annuler
             </button>
             <button
               type="button"
-              @click="nextStep"
+              @click.stop="nextStep"
               v-show="currentStep < steps.length - 1"
               class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
@@ -423,8 +421,12 @@
 </template>
 
 <script setup>
-import { ref, watch, defineProps, defineEmits } from "vue";
+import { ref, watch, defineProps, defineEmits, computed, onMounted } from "vue";
 import { useElementStore } from "../../store/elementStore";
+import { useEmplacementStore } from "../../store/emplacementStore";
+import { useEtatElementStore } from "../../store/etatElementStore";
+import { useTypeElementStore } from "../../store/typeElementStore";
+import { useUsageStore } from "../../store/usageStore";
 
 const props = defineProps({
   isOpen: {
@@ -434,26 +436,20 @@ const props = defineProps({
   element: {
     type: Object,
     required: true,
-  },
-  types: {
-    type: Array,
-    default: () => [],
-  },
-  etats: {
-    type: Array,
-    default: () => [],
-  },
-  emplacements: {
-    type: Array,
-    default: () => [],
-  },
-  usages: {
-    type: Array,
-    default: () => [],
-  },
+  }
 });
 
 const emit = defineEmits(["close", "update"]);
+
+const emplacementStore = useEmplacementStore();
+const etatStore = useEtatElementStore();
+const typeStore = useTypeElementStore();
+const usageStore = useUsageStore();
+
+const types = computed(() => typeStore.typeElements);
+const usages = computed(() => usageStore.usages);
+const etats = computed(() => etatStore.etatElements);
+const emplacements = computed(() => emplacementStore.emplacements);
 
 const isLoading = ref(false);
 const errors = ref({});
@@ -527,12 +523,19 @@ const submitForm = async () => {
       currentStep.value = 3;
     }
   }
-  
+
   if (!errors.value) {
     isLoading.value = false;
     emit("update");
   }
 };
+
+onMounted(async () => {
+  await emplacementStore.fetchEmplacements();
+  await etatStore.fetchEtatElements();
+  await typeStore.fetchTypeElements();
+  await usageStore.fetchUsages();
+});
 </script>
 
 <style scoped>

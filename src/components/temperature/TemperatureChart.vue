@@ -35,11 +35,6 @@ let chartInstance = null;
 
 const timeFormatOptions = computed(() => {
   switch (props.period) {
-    case "day":
-      return {
-        hour: "2-digit",
-        minute: "2-digit",
-      };
     case "week":
       return {
         weekday: "short",
@@ -81,7 +76,7 @@ const prepareChartData = () => {
     if (temp.type_alerte) {
       return temp.traitee ? "#F59E0B" : "#EF4444"; // Orange for treated alerts, red for untreated
     }
-    return "#3B82F6"; // Blue for normal readings
+    return "#3B82F6"; // Blue for normal
   });
 
   return {
@@ -118,8 +113,8 @@ const createChart = () => {
       scales: {
         y: {
           beginAtZero: false,
-          min: Math.floor(props.minTemp - 2),
-          max: Math.ceil(props.maxTemp + 2),
+          min: Math.floor(props.minTemp - 10),
+          max: Math.ceil(props.maxTemp + 10),
           title: {
             display: true,
             text: "Température (°C)",
