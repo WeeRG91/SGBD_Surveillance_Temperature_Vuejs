@@ -22,13 +22,26 @@ const selectedElement = computed(() => elementStore.currentElement);
 const isLoading = ref(false);
 
 onMounted(async () => {
-  isLoading.value = true;
-  await elementStore.fetchElement(route.params.id);
-  isLoading.value = false;
+  await loadElement(route.params.id);
 });
+
+watch(
+  () => route.params.id,
+  async (newId) => {
+    await loadElement(newId);
+  }
+);
+
+async function loadElement(id) {
+  isLoading.value = true;
+  try {
+    await elementStore.fetchElement(id);
+  } finally {
+    isLoading.value = false;
+  }
+}
 
 const handleDelete = () => {
   console.log("Delete button clicked");
-  // Show confirmation dialog and delete if confirmed
 };
 </script>

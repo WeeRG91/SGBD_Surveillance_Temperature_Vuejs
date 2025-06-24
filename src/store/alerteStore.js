@@ -29,7 +29,9 @@ export const useAlerteStore = defineStore("alerte", {
       const toast = useToastStore();
       this.errors = null;
       try {
-        const response = await alerteApi.update(id, data);
+        await alerteApi.update(id, data);
+        toast.addToast("Alerte traitée avec succès.");
+        this.fetchAlertes();
       } catch (error) {
         if (error.response) {
           this.errors = error.response.data.message || "Updating alerte failed";

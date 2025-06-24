@@ -682,8 +682,10 @@ const handleTemperatureRegister = async () => {
   await elementStore.fetchElement(props.element.id);
 };
 
-const handleTransferElement = () => {
+const handleTransferElement = async () => {
   isTransferModalOpen.value = false;
+  await elementStore.fetchElement(props.element.id);
+  await transfertStore.fetchTransfertsByElementId(props.element.id);
 };
 
 const handleDeleteConfirm = async () => {
@@ -696,8 +698,9 @@ const handleDeleteConfirm = async () => {
   }
 };
 
-const handleUpdateFormSubmit = () => {
+const handleUpdateFormSubmit = async () => {
   isEditModalOpen.value = false;
+  await elementStore.fetchElement(props.element.id);
 };
 
 const downloadQRCode = (qrCodeData, fileName) => {

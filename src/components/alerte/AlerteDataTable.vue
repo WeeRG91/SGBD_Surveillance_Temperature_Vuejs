@@ -74,7 +74,11 @@
               class="px-6 py-4 whitespace-nowrap text-sm"
             >
               <span
-                v-html="column.key === 'temp_date_heure' ? highlightSearchTerm(formatDate(item[column.key])) : highlightSearchTerm(item[column.key])"
+                v-html="
+                  column.key === 'temp_date_heure'
+                    ? highlightSearchTerm(formatDate(item[column.key]))
+                    : highlightSearchTerm(item[column.key])
+                "
                 :class="{
                   'bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs':
                     column.key === 'traitee' && item[column.key] === 'Traitée',
@@ -87,6 +91,7 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
               <div class="flex justify-center">
                 <button
+                  @click="openAlerteHandleModal(item['id'])"
                   title="Traiter l'alerte"
                   class="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50 transition-colors"
                 >
@@ -109,11 +114,19 @@
         </tbody>
       </table>
     </div>
+
+    <AlertHandleModal
+      :isOpen="isAlerteHandleModalOpen"
+      @close="isAlerteHandleModalOpen = false"
+      @confirm="handleAlerte"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
+import AlertHandleModal from "./AlertHandleModal.vue";
+import { useAlerteStore } from "../../store/alerteStore";
 
 const props = defineProps({
   data: {
@@ -128,10 +141,14 @@ const props = defineProps({
   },
 });
 
+const alerteStore = useAlerteStore();
+
 const selectedElement = ref("");
 const searchTerm = ref("");
 const sortKey = ref(props.columns[0]?.key || "");
 const sortDirection = ref("asc");
+const isAlerteHandleModalOpen = ref(false);
+const selectedAlerteId = ref(null);
 
 const uniqueElements = computed(() => {
   const elements = new Set();
@@ -222,5 +239,24 @@ const formatDate = (dateString) => {
     minute: "2-digit",
   };
   return new Date(dateString).toLocaleDateString("fr-FR", options);
+};
+
+const openAlerteHandleModal = (id_alerte) => {
+  selectedAlerteId.value = id_alerte;
+  isAlerteHandleModalOpen.value = true;
+};
+
+const handleAlerte = async () => {
+  if (selectedAlerteId.value) {
+    try {
+      await alerteStore.updateAlerte(selectedAlerteId.value, {
+        traitee: 1,
+      });
+      selectedAlerteId.value = null;
+      isAlerteHandleModalOpen.value = false;
+    } catch (error) {
+      console.error("Handling alerte failed:", error);
+    }
+  }
 };
 </script>

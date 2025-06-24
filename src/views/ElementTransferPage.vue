@@ -49,7 +49,7 @@
 
     <!-- Historique table -->
     <div
-      v-if="historiques"
+      v-if="transferts"
       class="bg-white rounded-lg shadow-md overflow-hidden"
     >
       <div class="overflow-x-auto">

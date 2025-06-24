@@ -10,6 +10,7 @@ import TypeElementPage from "../views/TypeElementPage.vue";
 import UsageElementPage from "../views/UsageElementPage.vue";
 import ElementDetailPage from "../views/ElementDetailPage.vue";
 import AlertePage from "../views/AlertePage.vue";
+import ElementTransferPage from "../views/ElementTransferPage.vue";
 
 const routes = [
   {
@@ -21,7 +22,7 @@ const routes = [
       { path: "elements/detail/:id", name: "element-detail", component: ElementDetailPage },
       { path: "elements/history/:id", name: "element-history", component: ElementHistoryPage },
       { path: "elements/temperature/:id", name: "element-temperature", component: ElementTemperaturePage },
-      { path: "elements/transfer/:id", name: "element-transfer", component: ElementTemperaturePage },
+      { path: "elements/transfer/:id", name: "element-transfer", component: ElementTransferPage },
       { path: "emplacements", name: "emplacements", component: EmplacementPage },
       { path: "etats", name: "etats", component: EtatElementPage },
       { path: "types", name: "types", component: TypeElementPage },
